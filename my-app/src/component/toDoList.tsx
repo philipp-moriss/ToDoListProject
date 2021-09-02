@@ -1,12 +1,14 @@
-import React, {ChangeEvent, KeyboardEvent , useState} from "react";
+import React, {ChangeEvent, useState} from "react";
 import {filterValues} from "../App";
+import Input from "./Input/input";
 
 type PropsToDoListType = {
-    title: string
-    tasks: Array<TaskType>
-    removeTask: (TaskType: string) => void
-    changeFilter: (filter: filterValues) => void
-    addTasks: (title: string) => void
+    title: string;
+    tasks: Array<TaskType>;
+    removeTask: (TaskType: string) => void;
+    changeFilter: (filter: filterValues) => void;
+    addTasks: (title: string) => void;
+    changeStatus : (taskId:string,isDone:boolean)=> void;
 
 }
 
@@ -19,27 +21,20 @@ export type TaskType = {
 
 function ToDoList(props: PropsToDoListType) {
 
-    const [title, setTitle] = useState<string>('input pleas')
-
     const changeAll = () => props.changeFilter('all')
     const changeActive = () => props.changeFilter('active')
-    const changeComplited = () => props.changeFilter('complited')
+    const changeCompleted = () => props.changeFilter('completed')
+    const [title, setTitle] = useState<string>('input pleas')
 
-    const addTasks = ()=> {props.addTasks(title)
-        setTitle('')
-    }
-
-    const onKeyPressAddTasks = (e : KeyboardEvent<HTMLInputElement> ) => {
-        if (e.key === 'Enter' ){
-            addTasks()
-        }
-    }
-
-    const changeTitel = (e:ChangeEvent<HTMLInputElement>) => setTitle(e.currentTarget.value)
 
     const taskJsxElement = props.tasks.map((t) => {
+        const onChangeHandler = (e : ChangeEvent<HTMLInputElement>) => props.changeStatus(t.id,e.currentTarget.checked)
         return (
-            <li key={t.id}><input type="checkbox" checked={t.isDone}/> <span>{t.title}</span>
+            <li key={t.id}><input
+                type="checkbox"
+                checked={t.isDone}
+                onChange={onChangeHandler}
+            /> <span>{t.title}</span>
                 <button onClick={() => {
                     props.removeTask(t.id)
                 }}>X
@@ -50,22 +45,15 @@ function ToDoList(props: PropsToDoListType) {
     })
     return (<div>
         <h3>{props.title}</h3>
-        <div>
-            <input
-                value={title}
-                onChange={changeTitel}
-                onKeyPress={onKeyPressAddTasks}
-            />
-            <button
-                onClick={addTasks}>+</button>
-                    </div>
+        <Input addTasks={props.addTasks} title={title} setTitle={setTitle} />
+
                     <ul>
                 {taskJsxElement}
                     </ul>
                     <div>
                     <button onClick={changeAll}>All</button>
                     <button onClick={changeActive}>Active</button>
-                    <button onClick={changeComplited}>Completed</button>
+                    <button onClick={changeCompleted}>Completed</button>
                     </div>
                     </div>)
                 }
